@@ -11,24 +11,24 @@ import seaborn as sns
 import pickle 
 
 #import model 
-rfc = pickle.load(open('cirhossis.pkl','rb'))
+svm = pickle.load(open('cirhossis.pkl','rb'))
 
 #load dataset
 data = pd.read_csv('Cirhossis.csv')
 #data = data.drop(data.columns[0],axis=1)
 
-st.title('Aplikasi Cirhossiss')
+st.title('Aplikasi Cirhossis')
 
 html_layout1 = """
 <br>
 <div style="background-color:red ; padding:2px">
-<h2 style="color:white;text-align:center;font-size:35px"><b>Diabetes Checkup</b></h2>
+<h2 style="color:white;text-align:center;font-size:35px"><b>Cirhossis Checkup</b></h2>
 </div>
 <br>
 <br>
 """
 st.markdown(html_layout1,unsafe_allow_html=True)
-activities = ['Rfc','Model Lain']
+activities = ['SVM','Model Lain']
 option = st.sidebar.selectbox('Pilihan mu ?',activities)
 st.sidebar.header('Data Pasien')
 
@@ -72,34 +72,58 @@ if st.checkbox('Train-Test Dataset'):
     st.write(y_test.head())
     st.write(y_test.shape)
 
-def user_report():
-    id = st.sidebar.slider('ID',0,20,1)
-    n_days = st.sidebar.slider('N_Days',0,200,108)
-    age = st.sidebar.slider('Age',0,100,25)
-    bilirubin = st.sidebar.slider('Bilirubin',0,200,108)
-    cholesterol = st.sidebar.slider('Cholesterol',0,140,40)
-    albumin = st.sidebar.slider('Albumin',0,140,40)
-    copper = st.sidebar.slider('Copper',0,100,25)
-    alk_Phos = st.sidebar.slider('Alk_Phos',0,1000,120)
-    sgot = st.sidebar.slider('SGOT',0,80,25)
-    tryglicerides = st.sidebar.slider('Tryglicerides', 0.05,2.5,0.45)
-    platelets = st.sidebar.slider('Platelets',21,100,24)
-    prothrombin = st.sidebar.slider('Prothrombin', 0.05,2.5,0.45)
-    
-    user_report_data = {
-        'ID':id,
-        'N_Days':n_days,
+import streamlit as st
+import numpy as np
 
-        'Age':age,
+def user_report():
+    id = st.text_input('ID', '')
+    status = st.radio('Status', ('On Treatment', 'Off Treatment'))
+    drug = st.radio('Drug', ('Asclera', 'Alopurinol', 'Oral Crystallographic Medecine', 'Efferal Prozol', 'Zenpro', 'Nabumetone', 'Acetaminophen'))
+    sex = st.radio('Sex', ('Male', 'Female'))
+    ascites = st.radio('Ascites', ('Yes', 'No'))
+    hepatomegaly = st.radio('Hepatomegaly', ('Yes', 'No'))
+    spiders = st.radio('Spiders', ('Yes', 'No'))
+    edema = st.radio('Edema', ('Yes', 'No'))
+    n_days = st.slider('Number of Days with Drug', 0, 365, 14)
+    age = st.slider('Age', 0, 100, 45)
+    bilirubin = st.slider('Bilirubin', 0, 100, 32)
+    cholesterol = st.slider('Cholesterol', 0, 200, 98)
+    albumin = st.slider('Albumin', 0, 50, 45)
+    copper = st.slider('Copper', 0, 200, 98)
+    alk_phos = st.slider('Alk_Phos', 0, 1000, 68)
+    sgot = st.sidebar.slider('SGOT',21,100,24)
+    tryglicerides = st.sidebar.slider('Tryglicerides',0,20,1)
+    platelets = st.sidebar.slider('Platelets',0,200,108)
+    prothrombin = st.sidebar.slider('Prothrombin',0,140,40)
+    stage = st.sidebar.slider('Stage',0,100,25)
+    
+    age_bins = np.linspace(0, 100, 16)
+    age_labels = list(range(1, 16))
+    age_group = age_labels[np.digitize(age, age_bins, right=True) - 1]
+
+    user_report_data = {
+        'ID' :id,
+        'Status' :status,
+        'Drug' :drug,
+        'Sex' :sex,
+        'Ascites' :ascites,
+        'Hepatomegaly' :hepatomegaly,
+        'Spiders' :spiders,
+        'Edema' :edema,
+        'N_Days':n_days,
+        'Age':age_group,
         'Bilirubin':bilirubin,
         'Cholesterol':cholesterol,
         'Albumin':albumin,
         'Copper':copper,
-        'Alk_Phos':alk_Phos,
+        'Alk_Phos':alk_phos,
         'SGOT':sgot,
         'Tryglicerides':tryglicerides,
         'Platelets':platelets,
-        'Prothrombin':prothrombin
+        'Prothrombin':prothrombin,
+        'Stage':stage
+
+       
     }
     report_data = pd.DataFrame(user_report_data,index=[0])
     return report_data
@@ -109,8 +133,8 @@ user_data = user_report()
 st.subheader('Data Pasien')
 st.write(user_data)
 
-user_result = rfc.predict(user_data)
-svc_score = accuracy_score(y_test,rfc.predict(X_test))
+user_result = svm.predict(user_data)
+svc_score = accuracy_score(y_test,svm.predict(X_test))
 
 #output
 st.subheader('Hasilnya adalah : ')
