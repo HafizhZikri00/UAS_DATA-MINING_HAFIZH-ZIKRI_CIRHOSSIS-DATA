@@ -11,7 +11,7 @@ import seaborn as sns
 import pickle 
 
 #import model 
-rfc = pickle.load(open('Rfc.pkl','rb'))
+rfc = pickle.load(open('cirhossis.pkl','rb'))
 
 #load dataset
 data = pd.read_csv('Cirhossis.csv')
@@ -54,8 +54,8 @@ if st.checkbox('EDa'):
     st_profile_report(pr)
 
 #train test split
-X = data.drop('Outcome',axis=1)
-y = data['Outcome']
+X = data.drop('Stage',axis=1)
+y = data['Stage']
 X_train, X_test,y_train,y_test = train_test_split(X,y,test_size=0.20,random_state=42)
 
 #Training Data
@@ -73,34 +73,33 @@ if st.checkbox('Train-Test Dataset'):
     st.write(y_test.shape)
 
 def user_report():
-    kehamilan = st.sidebar.slider('Kehamilan',0,20,1)
-    glukosa = st.sidebar.slider('Glukosa',0,200,108)
-    bp = st.sidebar.slider('Tekanan Darah',0,140,40)
-    skinthickness = st.sidebar.slider('Ketebalan Kulit',0,100,25)
-    insulin = st.sidebar.slider('Insulin',0,1000,120)
-    bmi = st.sidebar.slider('BMI',0,80,25)
-    diabetespd = st.sidebar.slider('Diabetes Pedigree', 0.05,2.5,0.45)
-    age = st.sidebar.slider('Usia',21,100,24)
+    id = st.sidebar.slider('ID',0,20,1)
+    n_days = st.sidebar.slider('N_Days',0,200,108)
+    age = st.sidebar.slider('Age',0,100,25)
+    bilirubin = st.sidebar.slider('Bilirubin',0,200,108)
+    cholesterol = st.sidebar.slider('Cholesterol',0,140,40)
+    albumin = st.sidebar.slider('Albumin',0,140,40)
+    copper = st.sidebar.slider('Copper',0,100,25)
+    alk_Phos = st.sidebar.slider('Alk_Phos',0,1000,120)
+    sgot = st.sidebar.slider('SGOT',0,80,25)
+    tryglicerides = st.sidebar.slider('Tryglicerides', 0.05,2.5,0.45)
+    platelets = st.sidebar.slider('Platelets',21,100,24)
+    prothrombin = st.sidebar.slider('Prothrombin', 0.05,2.5,0.45)
     
     user_report_data = {
         'ID':id,
-        'N_Days':glukosa,
-        'Drug':bp,
-        'Age':skinthickness,
-        'Sex':insulin,
-        'Ascites':bmi,
-        'Hepatomegaly':diabetespd,
-        'Spiders':age,
-        'Edema':edema,
-        'Bilirubin':glukosa,
-        'Cholesterol':bp,
-        'Copper':skinthickness,
-        'Alk_Phos':insulin,
-        'SGOT':bmi,
-        'Tryglicerides':diabetespd,
-        'Platelets':age,
-        'Prothrombin':diabetespd,
-       'Stage':age
+        'N_Days':n_days,
+
+        'Age':age,
+        'Bilirubin':bilirubin,
+        'Cholesterol':cholesterol,
+        'Albumin':albumin,
+        'Copper':copper,
+        'Alk_Phos':alk_Phos,
+        'SGOT':sgot,
+        'Tryglicerides':tryglicerides,
+        'Platelets':platelets,
+        'Prothrombin':prothrombin
     }
     report_data = pd.DataFrame(user_report_data,index=[0])
     return report_data
@@ -110,8 +109,8 @@ user_data = user_report()
 st.subheader('Data Pasien')
 st.write(user_data)
 
-user_result = svm.predict(user_data)
-svc_score = accuracy_score(y_test,svm.predict(X_test))
+user_result = rfc.predict(user_data)
+svc_score = accuracy_score(y_test,rfc.predict(X_test))
 
 #output
 st.subheader('Hasilnya adalah : ')
